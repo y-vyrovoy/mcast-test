@@ -5,15 +5,17 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net"
+	"strings"
 	"time"
 
 	"sync"
 
 	"github.com/pkg/errors"
-	"main/tctip"
 )
 
 func main() {
+
+	fmt.Println("msg:", string(generateNmeaMessage(343)))
 
 	//addresses()
 
@@ -22,20 +24,20 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	//addr := "224.0.0.1:8888"
-	//addr := "239.0.112.1:6501"
+	addr := "239.0.112.1:6501"
 
 	//netInterface := "en0"
-
 	//mcast.StartServer(ctx, wg, netInterface, addr, "0", cancel)
 	//mcast.StartServer(ctx, wg, netInterface, addr, "1", cancel)
+
 	//mcast.StartPing(ctx, wg, addr, "3", cancel)
 
-	tctip.StartServer(ctx, wg, ":8080", "0", cancel)
+	//tctip.StartServer(ctx, wg, ":8080", "0", cancel)
 	//tctip.StartServer(ctx, wg, ":8080", "1", cancel)
 
-	tctip.StartPing(ctx, wg, ":8080", "0", cancel)
+	//tctip.StartPing(ctx, wg, ":8080", "0", cancel)
 
-
+	startSendNmea(ctx, wg, addr, "test3.nmea", cancel)
 
 	wg.Wait()
 }
@@ -98,6 +100,13 @@ func sendNmea(ctx context.Context, wg *sync.WaitGroup, address, fileName string,
 		return errors.Wrapf(err, "failed to read file %s", fileName)
 	}
 
+	fmt.Println()
+	fmt.Println("--------")
+	fmt.Println(data)
+	fmt.Println(string(data))
+	fmt.Println("--------")
+	fmt.Println()
+
 	conn, err := net.Dial("udp", address)
 	if err != nil {
 		stop()
@@ -105,7 +114,7 @@ func sendNmea(ctx context.Context, wg *sync.WaitGroup, address, fileName string,
 	}
 	defer conn.Close()
 
-	cnt := 0
+	cnt := 340
 	for {
 		select {
 		case <-ctx.Done():
@@ -116,42 +125,25 @@ func sendNmea(ctx context.Context, wg *sync.WaitGroup, address, fileName string,
 		}
 
 		fmt.Printf("\n\n =========\nSENDING NEXT #%d \n\n", cnt)
-		cnt++
 
-		if _, err := conn.Write(data); err != nil {
+		if _, err := conn.Write(generateNmeaMessage(cnt)); err != nil {
 			fmt.Printf("failed to send data: %s", err.Error())
 		}
 
-		time.Sleep(1 * time.Second)
+		cnt++
+
+		time.Sleep(10 * time.Second)
 	}
 }
 
-//func server(wg *sync.WaitGroup, address, id string) error {
-//	defer wg.Done()
-//
-//	udpAddress, err := net.ResolveUDPAddr("udp", address)
-//	if err != nil {
-//		return errors.Wrap(err, "server failed to resolve address")
-//	}
-//
-//	conn, err := net.ListenUDP("udp", udpAddress)
-//	if err != nil {
-//		return errors.Wrap(err, "server failed to listen UDP")
-//	}
-//	defer func() {
-//		_ = conn.Close()
-//	}()
-//
-//	for {
-//		buff := make([]byte, 20)
-//		rlen, remote, err := conn.ReadFromUDP(buff[:])
-//
-//		if err != nil {
-//			return errors.Wrap(err, "failed to read UDP")
-//		}
-//
-//		message := strings.TrimSpace(string(buff))
-//
-//		fmt.Printf("server [%s] message from [%s:%d] (%d bytes): %s\n", id, remote.IP, remote.Port, rlen, message)
-//	}
-//}
+func generateNmeaMessage(i int) []byte {
+	body := fmt.Sprintf("HEHDT,%d.0,T", i)
+
+	var sum rune
+	for _, b := range body {
+		sum = sum ^ b
+	}
+	checksum := strings.ToUpper(fmt.Sprintf("%2.x", sum))
+
+	return []byte(fmt.Sprintf("$%s*%s\r\n", body, checksum))
+}
