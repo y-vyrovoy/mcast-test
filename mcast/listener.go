@@ -40,26 +40,6 @@ func server(ctx context.Context, wg *sync.WaitGroup, ifName, address, id string)
 		return errors.Wrap(err, "failed to listen to multicast group")
 	}
 
-	//f, err := conn.File()
-	//if err != nil {
-	//	return errors.Wrap(err, "failed to get connection file")
-	//}
-	//
-	//fd := f.Fd()
-	//
-	//err = syscall.SetsockoptInt(int(fd), syscall.SOL_SOCKET, syscall.SO_REUSEADDR,  1)
-	//if err != nil {
-	//	return errors.Wrap(err, "failed to set SO_REUSEADDR")
-	//}
-	//
-	//err = syscall.SetsockoptInt(int(fd), syscall.SOL_SOCKET, syscall.SO_REUSEPORT,  1)
-	//if err != nil {
-	//	return errors.Wrap(err, "failed to set SO_REUSEPORT")
-	//}
-	//
-	//
-	//fmt.Printf("socket: %d\n", fd)
-
 	buff := make([]byte, 200)
 	for {
 		select {

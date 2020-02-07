@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"strings"
 	"sync"
 	"syscall"
+	"time"
 
 	"github.com/pkg/errors"
 )
@@ -66,24 +68,46 @@ func server(ctx context.Context, wg *sync.WaitGroup, address, id string) error {
 	}
 }
 
+var cnt = 0
+
 func msgHandler(conn net.Conn, id string) {
 
 	defer conn.Close()
 
-	buff := make([]byte, 200)
+	//buff := make([]byte, 200)
 
 	for {
-		rlen, err := conn.Read(buff)
-		if err != nil {
-			fmt.Errorf("[%s] failed to read data: %s", id, err.Error())
-			return
-		}
+	//	rlen, err := conn.Read(buff)
+	//	if err != nil {
+	//		fmt.Errorf("[%s] failed to read data: %s", id, err.Error())
+	//		return
+	//	}
+	//
+	//	fmt.Printf("[%s] message:\n"+
+	//		"\tlen: %d\n"+
+	//		"\tsrc: %s\n" +
+	//		"\tmsg: %s\n"+
+	//		"-------\n\n",
+	//		id, rlen, conn.LocalAddr(), string(buff))
 
-		fmt.Printf("[%s] message:\n"+
-			"\tlen: %d\n"+
-			"\tsrc: %s\n" +
-			"\tmsg: %s\n"+
-			"-------\n\n",
-			id, rlen, conn.LocalAddr(), string(buff))
+		msg := generateNmeaMessage(cnt)
+
+		_, _ = conn.Write(msg)
+		fmt.Printf( "------ %d SENT ------- \n", cnt)
+		cnt++
+
+		time.Sleep(1 * time.Second)
 	}
+}
+
+func generateNmeaMessage(i int) []byte {
+	body := fmt.Sprintf("HEHDT,%d.0,T", i)
+
+	var sum rune
+	for _, b := range body {
+		sum = sum ^ b
+	}
+	checksum := strings.ToUpper(fmt.Sprintf("%2.x", sum))
+
+	return []byte(fmt.Sprintf("$%s*%s\r\n", body, checksum))
 }
