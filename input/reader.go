@@ -38,21 +38,24 @@ func (r *MessageReader) ReadNext() (string, time.Duration, bool) {
 		return "", 0, false
 	}
 
+	delay := time.Duration(r.data[0].DelaySec) * time.Second
+
 	var line string
 
-	if len(r.data[0].Tags) > 0{
-		tagsChecksum := checkSum(r.data[0].Tags, r.data[0].CorrectChecksum)
-		line = fmt.Sprintf("\\%s*%x\\", r.data[0].Tags, tagsChecksum)
+	for _, sentence := range r.data[0].Sentences{
+
+		if len(sentence.Tags) > 0{
+			tagsChecksum := checkSum(sentence.Tags, r.data[0].CorrectChecksum)
+			line = fmt.Sprintf("\\%s*%x\\", sentence.Tags, tagsChecksum)
+		}
+
+		if len(sentence.Params) > 0{
+			paramsChecksum := checkSum(sentence.Params, r.data[0].CorrectChecksum)
+			line += fmt.Sprintf("$%s*%x", sentence.Params, paramsChecksum)
+		}
+
+		line = line + "\r\n"
 	}
-
-	if len(r.data[0].Params) > 0{
-		paramsChecksum := checkSum(r.data[0].Params, r.data[0].CorrectChecksum)
-		line += fmt.Sprintf("$%s*%x", r.data[0].Params, paramsChecksum)
-	}
-
-	line = line + "\r\n"
-
-	delay := time.Duration(r.data[0].DelaySec) * time.Second
 
 	r.data = r.data[1:]
 

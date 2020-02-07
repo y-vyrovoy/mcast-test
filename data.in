@@ -3,20 +3,33 @@
 		{
 			"delay": 2,
 			"correctChecksum": true,
-			"tags": "g:1-2-33,a:tagA",
-			"params": "GPGGA,050214.56,1333.7380,N,05027.3577,E,2,07,01,+0051,M,-034,M,,"
+			"sentences": [
+				{
+					"tags": "g:1-2-33,a:tagA",
+					"params": "GPGGA,050214.56,1333.7380,N,05027.3577,E,2,07,01,+0051,M,-034,M,,"
+				}
+			]
 		},
 		{
 			"delay": 2,
 			"correctChecksum": true,
-			"tags": "g:2-2-33,b:tagB",
-			"params": ""
+			"sentences": [
+				{
+					"tags": "g:2-2-33,b:tagB",
+					"params": ""
+				}
+			]
+
 		},
 		{
 			"delay": 2,
-			"correctChecksum": false,
-			"tags": "g:2-2-33,b:tagB",
-			"params": ""
+			"correctChecksum": true,
+			"sentences": [
+				{
+					"tags": "g:1-2-34,c:tagC",
+					"params": ""
+				}
+			]
 		}
 	]
 }
