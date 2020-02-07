@@ -7,7 +7,7 @@ import (
 	"sync"
 
 	"main/input"
-	"main/tctip"
+	"main/mcast"
 )
 
 func main() {
@@ -18,21 +18,20 @@ func main() {
 	}
 	fmt.Println(inputReader)
 
-
 	wg := &sync.WaitGroup{}
 
 	ctx, cancel := context.WithCancel(context.Background())
 
 	//addr := "192.168.15.137:8080"
-	addr := "127.0.0.1:8080"
+	//addr := "127.0.0.1:8080"
 
-	tctip.StartPing(ctx, wg, addr, "0", inputReader, cancel)
+	//tctip.StartPing(ctx, wg, addr, "0", inputReader, cancel)
 
-
+	addr := "239.0.112.1:6501"
+	mcast.StartPing(ctx, wg, addr, "0", inputReader, cancel)
 
 	wg.Wait()
 }
-
 
 func oldMain() {
 	//addr := "224.0.0.1:8888"
@@ -88,6 +87,7 @@ func addresses() {
 
 	}
 }
+
 //
 //func startSendNmea(ctx context.Context, wg *sync.WaitGroup, address, fileName string, stop func()) {
 //	wg.Add(1)

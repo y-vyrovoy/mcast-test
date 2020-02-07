@@ -3,6 +3,7 @@ package mcast
 import (
 	"context"
 	"fmt"
+	"main/input"
 	"net"
 	"sync"
 	"time"
@@ -10,20 +11,20 @@ import (
 	"github.com/pkg/errors"
 )
 
-func StartPing(ctx context.Context, wg *sync.WaitGroup, address, id string, stop func()) {
+func StartPing(ctx context.Context, wg *sync.WaitGroup, address, id string, reader *input.MessageReader, stop context.CancelFunc) {
 	wg.Add(1)
 
 	go func() {
 		defer stop()
 
-		err := ping(ctx, wg, address, id)
+		err := ping(ctx, wg, address, id, reader)
 		if err != nil {
 			fmt.Printf("ping stopped with error: %s\n", err.Error())
 		}
 	}()
 }
 
-func ping(ctx context.Context, wg *sync.WaitGroup, address, id string) error {
+func ping(ctx context.Context, wg *sync.WaitGroup, address, id string, reader *input.MessageReader) error {
 	defer wg.Done()
 
 	cnt := 0
@@ -34,17 +35,25 @@ func ping(ctx context.Context, wg *sync.WaitGroup, address, id string) error {
 	}
 	defer conn.Close()
 
+	fmt.Println("start sending")
+
 	for {
-		ticker := time.NewTicker(2 * time.Second)
-		select {
-		case <-ctx.Done():
-			fmt.Println("sender is going down")
+
+		data, delay, ok := reader.ReadNext()
+		if !ok {
 			return nil
-		case <-ticker.C:
 		}
 
-		_, _ = fmt.Fprintf(conn, "ping [id:%s] UDP message %d", id, cnt)
+		fmt.Printf("------ %d SENDING ------- [%v] \n", cnt, data)
+		_, err = conn.Write([]byte(data))
+
+		if err != nil {
+			fmt.Println("----- ERR: " + err.Error())
+			return err
+		}
+		//_, _ = fmt.Fprintf(conn, "ping [id:%s] TCP message %d", id, cnt)
 		cnt++
+
+		time.Sleep(delay)
 	}
 }
-

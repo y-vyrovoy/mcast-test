@@ -6,7 +6,6 @@ import (
 	"net"
 	"strings"
 	"sync"
-	"syscall"
 	"time"
 
 	"github.com/pkg/errors"
@@ -38,18 +37,18 @@ func server(ctx context.Context, wg *sync.WaitGroup, address, id string) error {
 	}
 	defer l.Close()
 
-	f, _ := l.File()
-	fd := f.Fd()
+	// f, _ := l.File()
+	// fd := f.Fd()
 
-	err = syscall.SetsockoptInt(int(fd), syscall.SOL_SOCKET, syscall.SO_REUSEADDR,  1)
-	if err != nil {
-		return errors.Wrap(err, "failed to set SO_REUSEADDR")
-	}
+	// err = syscall.SetsockoptInt(int(fd), syscall.SOL_SOCKET, syscall.SO_REUSEADDR,  1)
+	// if err != nil {
+	// 	return errors.Wrap(err, "failed to set SO_REUSEADDR")
+	// }
 
-	err = syscall.SetsockoptInt(int(fd), syscall.SOL_SOCKET, syscall.SO_REUSEPORT,  1)
-	if err != nil {
-		return errors.Wrap(err, "failed to set SO_REUSEPORT")
-	}
+	// err = syscall.SetsockoptInt(int(fd), syscall.SOL_SOCKET, syscall.SO_REUSEPORT,  1)
+	// if err != nil {
+	// 	return errors.Wrap(err, "failed to set SO_REUSEPORT")
+	// }
 
 	for {
 		select {
@@ -61,7 +60,7 @@ func server(ctx context.Context, wg *sync.WaitGroup, address, id string) error {
 
 		conn, err := l.Accept()
 		if err != nil {
-			fmt.Errorf("[%s] failed to accept connection: %s", id, err.Error())
+			return fmt.Errorf("[%s] failed to accept connection: %s", id, err.Error())
 		}
 
 		go msgHandler(conn, id)
@@ -77,23 +76,23 @@ func msgHandler(conn net.Conn, id string) {
 	//buff := make([]byte, 200)
 
 	for {
-	//	rlen, err := conn.Read(buff)
-	//	if err != nil {
-	//		fmt.Errorf("[%s] failed to read data: %s", id, err.Error())
-	//		return
-	//	}
-	//
-	//	fmt.Printf("[%s] message:\n"+
-	//		"\tlen: %d\n"+
-	//		"\tsrc: %s\n" +
-	//		"\tmsg: %s\n"+
-	//		"-------\n\n",
-	//		id, rlen, conn.LocalAddr(), string(buff))
+		//	rlen, err := conn.Read(buff)
+		//	if err != nil {
+		//		fmt.Errorf("[%s] failed to read data: %s", id, err.Error())
+		//		return
+		//	}
+		//
+		//	fmt.Printf("[%s] message:\n"+
+		//		"\tlen: %d\n"+
+		//		"\tsrc: %s\n" +
+		//		"\tmsg: %s\n"+
+		//		"-------\n\n",
+		//		id, rlen, conn.LocalAddr(), string(buff))
 
 		msg := generateNmeaMessage(cnt)
 
 		_, _ = conn.Write(msg)
-		fmt.Printf( "------ %d SENT ------- \n", cnt)
+		fmt.Printf("------ %d SENT ------- \n", cnt)
 		cnt++
 
 		time.Sleep(1 * time.Second)
