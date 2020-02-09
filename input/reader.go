@@ -3,6 +3,7 @@ package input
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"time"
 
@@ -33,6 +34,17 @@ func New(fname string) (*MessageReader, error) {
 
 }
 
+func (r *MessageReader) Dump(w io.Writer) {
+	data, err := json.MarshalIndent(r.data, "", "  ")
+
+	if err != nil {
+		w.Write([]byte("failed to dump MessageReader: " + err.Error() + "\n"))
+	}
+
+	_, _ = w.Write(data)
+	_, _ = w.Write([]byte("\n"))
+}
+
 func (r *MessageReader) ReadNext() (string, time.Duration, bool) {
 	if len(r.data) == 0 {
 		return "", 0, false
@@ -46,7 +58,7 @@ func (r *MessageReader) ReadNext() (string, time.Duration, bool) {
 
 		if len(sentence.Tags) > 0{
 			tagsChecksum := checkSum(sentence.Tags, r.data[0].CorrectChecksum)
-			line = fmt.Sprintf("\\%s*%x\\", sentence.Tags, tagsChecksum)
+			line += fmt.Sprintf("\\%s*%x\\", sentence.Tags, tagsChecksum)
 		}
 
 		if len(sentence.Params) > 0{

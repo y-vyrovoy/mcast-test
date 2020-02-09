@@ -11,7 +11,7 @@ import (
 	"main/input"
 )
 
-func StartPing(ctx context.Context, wg *sync.WaitGroup, address, id string, inReader *input.MessageReader, stop func()) {
+func StartClient(ctx context.Context, wg *sync.WaitGroup, address, id string, inReader *input.MessageReader, stop func()) {
 	wg.Add(1)
 
 	go func() {
@@ -64,7 +64,7 @@ func ping(ctx context.Context, wg *sync.WaitGroup, address, id string, reader *i
 			return nil
 		}
 
-		fmt.Printf( "------ %d SENDING ------- [%v] \n", cnt, data)
+		fmt.Printf("------ %d SENDING ------- \n%v--------------\n", cnt, data)
 		_, err = conn.Write([]byte(data))
 
 		if err != nil {

@@ -1,0 +1,53 @@
+{
+	"data": [
+		{
+			"delay": 2,
+			"correctChecksum": true,
+			"sentences": [
+				{
+					"tags": "g:1-2-33,a:tagA33",
+					"params": "GPGGA,050214.56,1333.7380,N,05027.3577,E,2,07,01,+0051,M,-034,M,,"
+				},
+				{
+					"tags": "g:1-2-31,a:tagA31",
+					"params": "GPGGA,050214.56,1333.7380,N,05027.3577,E,2,07,01,+0051,M,-034,M,,"
+				}
+			]
+		},
+		{
+			"delay": 2,
+			"correctChecksum": true,
+			"sentences": [
+				{
+					"tags": "g:2-2-31,b:tagB31",
+					"params": ""
+				},
+				{
+					"tags": "g:2-2-33,b:tagB33",
+					"params": ""
+				}
+			]
+
+		},
+		{
+			"delay": 7,
+			"correctChecksum": true,
+			"sentences": [
+				{
+					"tags": "g:1-2-34,c:tagC",
+					"params": ""
+				}
+			]
+		},
+		{
+			"delay": 2,
+			"correctChecksum": true,
+			"sentences": [
+				{
+					"tags": "g:2-2-34,d:tagD",
+					"params": ""
+				}
+			]
+		}
+	]
+}

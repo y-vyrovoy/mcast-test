@@ -11,20 +11,20 @@ import (
 	"github.com/pkg/errors"
 )
 
-func StartPing(ctx context.Context, wg *sync.WaitGroup, address, id string, reader *input.MessageReader, stop context.CancelFunc) {
+func StartPing(ctx context.Context, wg *sync.WaitGroup, address string, reader *input.MessageReader, stop context.CancelFunc) {
 	wg.Add(1)
 
 	go func() {
 		defer stop()
 
-		err := ping(ctx, wg, address, id, reader)
+		err := ping(ctx, wg, address, reader)
 		if err != nil {
 			fmt.Printf("ping stopped with error: %s\n", err.Error())
 		}
 	}()
 }
 
-func ping(ctx context.Context, wg *sync.WaitGroup, address, id string, reader *input.MessageReader) error {
+func ping(ctx context.Context, wg *sync.WaitGroup, address string, reader *input.MessageReader) error {
 	defer wg.Done()
 
 	cnt := 0
@@ -41,10 +41,11 @@ func ping(ctx context.Context, wg *sync.WaitGroup, address, id string, reader *i
 
 		data, delay, ok := reader.ReadNext()
 		if !ok {
+			fmt.Println("reader ReadNext() returned false")
 			return nil
 		}
 
-		fmt.Printf("------ %d SENDING ------- [%v] \n", cnt, data)
+		fmt.Printf("------ %d SENDING ------- \n %v--------------\n", cnt, data)
 		_, err = conn.Write([]byte(data))
 
 		if err != nil {
