@@ -8,10 +8,10 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"main/input"
+	"main/datasource"
 )
 
-func StartServer(ctx context.Context, wg *sync.WaitGroup, address string, inReader *input.MessageReader, stop func()) {
+func StartServer(ctx context.Context, wg *sync.WaitGroup, address string, inReader *datasource.MessageReader, stop func()) {
 	wg.Add(1)
 	go func() {
 		defer stop()
@@ -23,7 +23,7 @@ func StartServer(ctx context.Context, wg *sync.WaitGroup, address string, inRead
 	}()
 }
 
-func server(ctx context.Context, wg *sync.WaitGroup, address string, inReader *input.MessageReader) error {
+func server(ctx context.Context, wg *sync.WaitGroup, address string, inReader *datasource.MessageReader) error {
 	defer wg.Done()
 
 	ipAddress, err := net.ResolveTCPAddr("tcp", address)
@@ -37,7 +37,6 @@ func server(ctx context.Context, wg *sync.WaitGroup, address string, inReader *i
 	}
 	defer l.Close()
 
-
 	for {
 		select {
 		case <-ctx.Done():
@@ -48,7 +47,7 @@ func server(ctx context.Context, wg *sync.WaitGroup, address string, inReader *i
 
 		conn, err := l.Accept()
 		if err != nil {
-			return fmt.Errorf("failed to accept connection: %s",  err.Error())
+			return fmt.Errorf("failed to accept connection: %s", err.Error())
 		}
 
 		go msgHandler(conn, *inReader)
@@ -57,7 +56,7 @@ func server(ctx context.Context, wg *sync.WaitGroup, address string, inReader *i
 
 var cnt = 0
 
-func msgHandler(conn net.Conn, reader input.MessageReader) {
+func msgHandler(conn net.Conn, reader datasource.MessageReader) {
 
 	defer conn.Close()
 

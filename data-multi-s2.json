@@ -59,45 +59,7 @@
 			"eol": false,
 			"sentences": [
 				{
-					"tags": "f:tagFF1"
-				}
-			]
-		},
-		{
-			"delay": 2,
-			"correctChecksum": true,
-			"eol": true,
-			"sentences": [
-				{
-					"params": "GPGGA,050214.56,1333.7380,N,05027.3577,E,2,07,01,+0051,M,-034,M,,"
-				}
-			]
-		},		{
-			"delay": 2,
-			"correctChecksum": true,
-			"eol": false,
-			"sentences": [
-				{
-					"tags": "f:tagFF2"
-				}
-			]
-		},
-		{
-			"delay": 2,
-			"correctChecksum": true,
-			"eol": true,
-			"sentences": [
-				{
-					"params": "GPGGA,050214.56,1333.7380,N,05027.3577,E,2,07,01,+0051,M,-034,M,,"
-				}
-			]
-		},		{
-			"delay": 2,
-			"correctChecksum": true,
-			"eol": false,
-			"sentences": [
-				{
-					"tags": "f:tagFF3"
+					"tags": "f:tagFF"
 				}
 			]
 		},

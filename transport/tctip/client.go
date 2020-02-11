@@ -8,10 +8,10 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"main/input"
+	"main/datasource"
 )
 
-func StartClient(ctx context.Context, wg *sync.WaitGroup, address, id string, inReader *input.MessageReader, stop func()) {
+func StartClient(ctx context.Context, wg *sync.WaitGroup, address, id string, inReader *datasource.MessageReader, stop func()) {
 	wg.Add(1)
 
 	go func() {
@@ -24,7 +24,7 @@ func StartClient(ctx context.Context, wg *sync.WaitGroup, address, id string, in
 	}()
 }
 
-func ping(ctx context.Context, wg *sync.WaitGroup, address, id string, reader *input.MessageReader) error {
+func ping(ctx context.Context, wg *sync.WaitGroup, address, id string, reader *datasource.MessageReader) error {
 	defer wg.Done()
 
 	fmt.Println("let's send")
@@ -78,4 +78,3 @@ func ping(ctx context.Context, wg *sync.WaitGroup, address, id string, reader *i
 	}
 
 }
-

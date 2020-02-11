@@ -1,4 +1,4 @@
-package input
+package datasource
 
 import (
 	"encoding/json"
@@ -50,26 +50,31 @@ func (r *MessageReader) ReadNext() (string, time.Duration, bool) {
 		return "", 0, false
 	}
 
-	delay := time.Duration(r.data[0].DelaySec) * time.Second
+	nextData := r.data[0]
+	r.data = r.data[1:]
+
+	delay := time.Duration(nextData.DelaySec) * time.Second
 
 	var line string
 
-	for _, sentence := range r.data[0].Sentences{
+	for _, sentence := range nextData.Sentences {
 
-		if len(sentence.Tags) > 0{
-			tagsChecksum := checkSum(sentence.Tags, r.data[0].CorrectChecksum)
+		if len(sentence.Tags) > 0 {
+			tagsChecksum := checkSum(sentence.Tags, nextData.CorrectChecksum)
 			line += fmt.Sprintf("\\%s*%x\\", sentence.Tags, tagsChecksum)
 		}
 
-		if len(sentence.Params) > 0{
-			paramsChecksum := checkSum(sentence.Params, r.data[0].CorrectChecksum)
+		if len(sentence.Params) > 0 {
+			paramsChecksum := checkSum(sentence.Params, nextData.CorrectChecksum)
 			line += fmt.Sprintf("$%s*%x", sentence.Params, paramsChecksum)
 		}
 
-		line = line + "\r\n"
+		if nextData.EOL {
+			line = line + "\r\n"
+		}
 	}
 
-	r.data = r.data[1:]
+	fmt.Printf("-- READ NEXT: [%v]\n", line)
 
 	return line, delay, true
 }
