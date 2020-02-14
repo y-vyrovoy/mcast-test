@@ -3,10 +3,10 @@
 		{
 			"delay": 2,
 			"correctChecksum": true,
-			"eol": false,
+			"eol": true,
 			"sentences": [
 				{
-					"tags": "f:tagFF1234567890"
+					"params": "GPGGA,050214.56,1333.7380,N,05027.3577,E,2,07,01,+0051,M,-034,M,,"
 				}
 			]
 		}
