@@ -2,7 +2,6 @@ package mcast
 
 import (
 	"context"
-	"fmt"
 	"net"
 	"sync"
 
@@ -29,7 +28,7 @@ func (w *mcastWriter) Run() error {
 	conn, err := net.Dial("udp", w.address)
 
 	if err != nil {
-		return errors.Wrap(err, "failed to run UDP writer")
+		return errors.Wrap(err, "failed to run UDP sender")
 	}
 	w.conn = conn
 
@@ -39,7 +38,6 @@ func (w *mcastWriter) Run() error {
 func (w *mcastWriter) Write(data []byte) error {
 
 	_, err := w.conn.Write(data)
-	fmt.Println("-- #-#-#----> mcast pinger Write()")
 
 	if err != nil {
 		return errors.Wrap(err, "failed to send UDP packet")

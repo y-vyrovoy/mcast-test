@@ -1,21 +1,18 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"net"
 	"os"
 	"sync"
 
 	"main/datasource"
-	"main/transport"
-	"main/transport/mcast"
-	"main/transport/tctip"
+	"main/transport/tcp"
 )
 
 func main() {
 
-	inputReader, err := datasource.New("data-multi-s4.json")
+	inputReader, err := datasource.New("data-multi-s2.json")
 	if err != nil {
 		fmt.Println("failed to read file:", err.Error())
 		return
@@ -23,29 +20,25 @@ func main() {
 
 	inputReader.Dump(os.Stdout)
 
-	writer := mcast.NewWriter("239.0.112.1:6501")
-	sender := transport.NewSender(writer, inputReader)
+	wg := &sync.WaitGroup{}
 
-	writer.Run()
-	sender.Run()
+	// Multicast
+	//sender := mcast.NewWriter("239.0.112.1:6501")
 
+	// tcp client
+	//sender := tcp.NewClientWriter("192.168.15.137:8080")
+
+	// tcp server
+	writer := tcp.NewServerWriter(":8080", inputReader)
+
+	//sender := transport.NewSender(sender, inputReader)
+
+	writer.Run(wg)
+	//sender.Run()
+
+
+	wg.Wait()
 }
-
-func RunTcpClient(ctx context.Context, wg *sync.WaitGroup, inReader *datasource.MessageReader, cancel context.CancelFunc) {
-	//addr := "192.168.15.137:8080"
-	addr := "127.0.0.1:8080"
-
-	tctip.StartClient(ctx, wg, addr, "0", inReader, cancel)
-}
-
-func RunTcpServer(ctx context.Context, wg *sync.WaitGroup, inReader *datasource.MessageReader, cancel context.CancelFunc) {
-	//addr := "192.168.15.137:8080"
-	addr := "127.0.0.1:8080"
-
-	tctip.StartServer(ctx, wg, addr, inReader, cancel)
-}
-
-
 
 func addresses() {
 	ifaces, err := net.Interfaces()
@@ -81,7 +74,6 @@ func addresses() {
 		}
 
 		fmt.Println()
-
 	}
 }
 

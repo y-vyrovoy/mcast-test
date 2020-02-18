@@ -32,7 +32,7 @@
 
 		},
 		{
-			"delay": 7,
+			"delay": 2,
 			"correctChecksum": true,
 			"eol": true,
 			"sentences": [

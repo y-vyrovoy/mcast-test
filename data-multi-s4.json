@@ -3,6 +3,16 @@
 		{
 			"delay": 2,
 			"correctChecksum": true,
+			"eol": false,
+			"sentences": [
+				{
+					"tags": "f:tagFF"
+				}
+			]
+		},
+		{
+			"delay": 2,
+			"correctChecksum": true,
 			"eol": true,
 			"sentences": [
 				{
