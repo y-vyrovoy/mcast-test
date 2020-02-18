@@ -15,7 +15,6 @@ type (
 		inputReader *datasource.MessageReader
 		listener    net.Listener
 	}
-
 )
 
 func NewServerWriter(address string, inputReader *datasource.MessageReader) *tcpServerWriter {
@@ -56,13 +55,11 @@ func (w *tcpServerWriter) listenWorker() {
 			return
 		}
 
-
-		fmt.Printf("\n --->connection from %s to %s\n\n",
+		fmt.Printf("\n ---> connection from %s to %s\n\n",
 			conn.RemoteAddr().String(),
 			conn.LocalAddr().String())
 
-
-		go func(){
+		go func() {
 			w.connectionWorker(conn)
 		}()
 	}
@@ -72,7 +69,7 @@ func (w *tcpServerWriter) connectionWorker(conn net.Conn) {
 	inp := *w.inputReader
 	connWriter := NewConnectionWriter(conn)
 
-	sndr := sender.NewSender(connWriter, &inp)
+	sndr := sender.New(connWriter, &inp)
 
 	go func() {
 		sndr.Run()

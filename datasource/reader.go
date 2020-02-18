@@ -38,7 +38,7 @@ func (r *MessageReader) Dump(w io.Writer) {
 	data, err := json.MarshalIndent(r.data, "", "  ")
 
 	if err != nil {
-		w.Write([]byte("failed to dump MessageReader: " + err.Error() + "\n"))
+		_, _ = w.Write([]byte("failed to dump MessageReader: " + err.Error() + "\n"))
 	}
 
 	_, _ = w.Write(data)

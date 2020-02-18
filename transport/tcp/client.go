@@ -8,7 +8,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-
 type tcpClientWriter struct {
 	address string
 	conn    net.Conn

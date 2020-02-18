@@ -1,79 +1,68 @@
 package main
 
 import (
+	"flag"
 	"fmt"
-	"net"
 	"os"
 	"sync"
 
 	"main/datasource"
+	"main/transport/mcast"
+	"main/transport/sender"
 	"main/transport/tcp"
 )
 
 func main() {
+
+	mode := flag.String("mode", "unknown", "input mode")
+	flag.Parse()
 
 	inputReader, err := datasource.New("data-multi-s2.json")
 	if err != nil {
 		fmt.Println("failed to read file:", err.Error())
 		return
 	}
-
 	inputReader.Dump(os.Stdout)
 
 	wg := &sync.WaitGroup{}
 
-	// Multicast
-	//sender := mcast.NewWriter("239.0.112.1:6501")
+	switch *mode {
+	case "mcast":
+		runMcast(wg, inputReader)
 
-	// tcp client
-	//sender := tcp.NewClientWriter("192.168.15.137:8080")
+	case "tcp_client":
+		runTcpClient(wg, inputReader)
 
-	// tcp server
-	writer := tcp.NewServerWriter(":8080", inputReader)
+	case "tcp_server":
+		runTcpServer(wg, inputReader)
 
-	//sender := transport.NewSender(sender, inputReader)
-
-	writer.Run(wg)
-	//sender.Run()
-
+	default:
+		fmt.Print("unknown mode")
+		return
+	}
 
 	wg.Wait()
 }
 
-func addresses() {
-	ifaces, err := net.Interfaces()
-	if err != nil {
-		fmt.Println("failed to get interfaces")
-		return
-	}
+func runMcast(wg *sync.WaitGroup, inputReader *datasource.MessageReader) {
 
-	for _, i := range ifaces {
-		fmt.Println()
-		fmt.Println(i.Name)
+	writer := mcast.NewWriter("239.0.112.1:6501")
+	sndr := sender.New(writer, inputReader)
 
-		addrs, err := i.Addrs()
-		if err != nil {
-			fmt.Println("failed to get addresses")
-		} else {
-			fmt.Println("\tlocal addresses")
-			for _, a := range addrs {
-				fmt.Printf("\t: %s\n", a.String())
-			}
-		}
-
-		fmt.Println()
-
-		mcaddrs, err := i.MulticastAddrs()
-		if err != nil {
-			fmt.Println("failed to get addresses")
-		} else {
-			fmt.Println("\tmulticast addresses")
-			for _, a := range mcaddrs {
-				fmt.Printf("\t: %s\n", a.String())
-			}
-		}
-
-		fmt.Println()
-	}
+	_ = writer.Run()
+	sndr.Run()
 }
 
+func runTcpClient(wg *sync.WaitGroup, inputReader *datasource.MessageReader) {
+
+	writer := tcp.NewClientWriter("192.168.15.137:8080")
+	sndr := sender.New(writer, inputReader)
+
+	_ = writer.Run()
+	sndr.Run()
+}
+
+func runTcpServer(wg *sync.WaitGroup, inputReader *datasource.MessageReader) {
+	writer := tcp.NewServerWriter(":8080", inputReader)
+	_ = writer.Run(wg)
+}

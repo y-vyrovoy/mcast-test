@@ -19,10 +19,10 @@ type (
 	}
 )
 
-func NewSender(writer Writer, reader *datasource.MessageReader) *Sender {
+func New(writer Writer, reader *datasource.MessageReader) *Sender {
 	return &Sender{
 		writer: writer,
-		reader:reader,
+		reader: reader,
 	}
 }
 
