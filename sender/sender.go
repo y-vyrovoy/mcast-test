@@ -51,7 +51,7 @@ func (s *Sender) Run() {
 		}
 		cnt++
 
-		fmt.Println("<<<<---|\n")
+		fmt.Printf("<<<<---|\n\n")
 
 		fmt.Printf("Sleep for %v\n\n", delay)
 		time.Sleep(delay)

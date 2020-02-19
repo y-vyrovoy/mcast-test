@@ -1,17 +1,30 @@
 {
+	"loopback": true,
 	"data": [
 		{
-			"delay": 2,
+			"delay": 200,
 			"correctChecksum": true,
-			"eol": false,
+			"eol": true,
 			"sentences": [
 				{
-					"tags": "f:tagFF"
+					"params": "PJRCD,RA,15,1"
 				}
 			]
 		},
 		{
-			"delay": 2,
+			"delay": 400,
+			"correctChecksum": true,
+			"eol": false,
+			"sentences": [
+				{
+					"tags": {
+						"addTime": true
+					}
+				}
+			]
+		},
+		{
+			"delay": 200,
 			"correctChecksum": true,
 			"eol": true,
 			"sentences": [

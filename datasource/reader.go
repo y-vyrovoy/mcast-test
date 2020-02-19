@@ -12,7 +12,9 @@ import (
 )
 
 type MessageReader struct {
-	data []model.Message
+	loopBack bool
+	data     []model.Message
+	idxNext  int
 }
 
 func New(fname string) (*MessageReader, error) {
@@ -29,7 +31,9 @@ func New(fname string) (*MessageReader, error) {
 	}
 
 	return &MessageReader{
-		data: data.Data,
+		loopBack: data.Loopback,
+		data:     data.Data,
+		idxNext:      0,
 	}, nil
 
 }
@@ -50,18 +54,34 @@ func (r *MessageReader) ReadNext() (string, time.Duration, bool) {
 		return "", 0, false
 	}
 
-	nextData := r.data[0]
-	r.data = r.data[1:]
+	if r.idxNext >= len(r.data) {
+		if r.loopBack {
+			r.idxNext = 0
+		} else
+		{
+			return "", 0, false
+		}
+	}
 
-	delay := time.Duration(nextData.DelaySec) * time.Second
+		nextData := r.data[r.idxNext]
+	delay := time.Duration(nextData.DelaySecMs) * time.Millisecond
 
 	var line string
 
 	for _, sentence := range nextData.Sentences {
 
-		if len(sentence.Tags) > 0 {
-			tagsChecksum := checkSum(sentence.Tags, nextData.CorrectChecksum)
-			line += fmt.Sprintf("\\%s*%x\\", sentence.Tags, tagsChecksum)
+		var tagLine string
+		if sentence.Tags.AddTime {
+			tagLine = fmt.Sprintf("c:%d", time.Now().Unix())
+		}
+
+		if len(sentence.Tags.Data) > 0 {
+			tagLine += "," + sentence.Tags.Data
+		}
+
+		if len(tagLine) > 0 {
+			tagsChecksum := checkSum(tagLine, nextData.CorrectChecksum)
+			line += fmt.Sprintf("\\%s*%x\\", tagLine, tagsChecksum)
 		}
 
 		if len(sentence.Params) > 0 {
@@ -76,16 +96,18 @@ func (r *MessageReader) ReadNext() (string, time.Duration, bool) {
 
 	fmt.Printf("-- READ NEXT: [%v]\n", line)
 
+	r.idxNext++
+
 	return line, delay, true
 }
 
-func checkSum(data string, correctChecksum bool) rune {
+func checkSum(data string, correctChecksum bool) byte {
 	if !correctChecksum {
-		return 12
+		return 0
 	}
 
-	var sum rune
-	for _, b := range data {
+	var sum byte
+	for _, b := range []byte(data) {
 		sum = sum ^ b
 	}
 

@@ -1,23 +1,27 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
+	"strings"
 	"sync"
 
 	"main/datasource"
+	"main/env"
+	"main/sender"
 	"main/transport/mcast"
-	"main/transport/sender"
 	"main/transport/tcp"
+
+	log "github.com/sirupsen/logrus"
 )
 
 func main() {
+	config := env.ReadOS()
+	config.Dump()
 
-	mode := flag.String("mode", "unknown", "input mode")
-	flag.Parse()
+	initLogger(config.LogLevel, config.PrettyLogOutput)
 
-	inputReader, err := datasource.New("data-multi-s2.json")
+	inputReader, err := datasource.New(config.SourceFile)
 	if err != nil {
 		fmt.Println("failed to read file:", err.Error())
 		return
@@ -26,7 +30,7 @@ func main() {
 
 	wg := &sync.WaitGroup{}
 
-	switch *mode {
+	switch config.OutputMode {
 	case "mcast":
 		runMcast(wg, inputReader)
 
@@ -63,6 +67,28 @@ func runTcpClient(wg *sync.WaitGroup, inputReader *datasource.MessageReader) {
 }
 
 func runTcpServer(wg *sync.WaitGroup, inputReader *datasource.MessageReader) {
-	writer := tcp.NewServerWriter(":8080", inputReader)
+
+	onConn := func(w sender.Writer) {
+		sndr := sender.New(w, inputReader)
+		sndr.Run()
+	}
+
+	writer := tcp.NewServerWriter(":8080", onConn)
 	_ = writer.Run(wg)
+}
+
+func initLogger(logLevel string, pretty bool) {
+	if pretty {
+		log.SetFormatter(&log.JSONFormatter{})
+	}
+	log.SetOutput(os.Stderr)
+
+	switch strings.ToLower(logLevel) {
+	case "error":
+		log.SetLevel(log.ErrorLevel)
+	case "info":
+		log.SetLevel(log.InfoLevel)
+	default:
+		log.SetLevel(log.DebugLevel)
+	}
 }

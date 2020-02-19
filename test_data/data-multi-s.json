@@ -1,0 +1,78 @@
+{
+	"loopback": true,
+	"data": [
+		{
+			"delay": 200,
+			"correctChecksum": true,
+			"eol": true,
+			"sentences": [
+				{
+					"params": "HEHDT,071.0,T"
+				}
+			]
+		},
+		{
+			"delay": 400,
+			"correctChecksum": true,
+			"eol": false,
+			"sentences": [
+				{
+					"tags": {
+						"addTime": true
+					}
+				}
+			]
+		},
+		{
+			"delay": 200,
+			"correctChecksum": true,
+			"eol": true,
+			"sentences": [
+				{
+					"params": "GPGGA,050214.56,1333.7380,N,05027.3577,E,2,07,01,+0051,M,-034,M,,"
+				}
+			]
+		},
+		{
+			"delay": 200,
+			"correctChecksum": true,
+			"eol": true,
+			"sentences": [
+				{
+					"tags": {
+						"addTime": true,
+						"data": "s:12345678"
+					},
+					"params": "GPGGA,050214.56,1333.7380,N,05027.3577,E,2,07,01,+0051,M,-034,M,,"
+				}
+			]
+		},
+		{
+			"delay": 200,
+			"correctChecksum": true,
+			"eol": true,
+			"sentences": [
+				{
+					"tags": {
+						"addTime": true,
+						"data": "g:1-2-33,s:987654321"
+					}
+				}
+			]
+		},
+		{
+			"delay": 200,
+			"correctChecksum": true,
+			"eol": true,
+			"sentences": [
+				{
+					"tags": {
+						"addTime": false,
+						"data": "g:2-2-33"
+					},
+					"params": "HEHDT,071.0,T"
+				}
+			]
+		}
+	]
+}

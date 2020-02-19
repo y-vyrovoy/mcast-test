@@ -1,17 +1,23 @@
 package model
 
 type MessageChain struct {
-	Data []Message `json:"data"`
+	Loopback bool      `json:"loopback"`
+	Data     []Message `json:"data"`
 }
 
 type Message struct {
-	DelaySec        int        `json:"delay"`
+	DelaySecMs      int        `json:"delay"`
 	CorrectChecksum bool       `json:"correctChecksum"`
 	Sentences       []Sentence `json:"sentences"`
 	EOL             bool       `json:"eol"`
 }
 
 type Sentence struct {
-	Tags   string `json:"tags"`
-	Params string `json:"params"`
+	Tags   TagsDefinition `json:"tags"`
+	Params string         `json:"params"`
+}
+
+type TagsDefinition struct {
+	AddTime bool   `json:"addTime"`
+	Data    string `json:"data"`
 }

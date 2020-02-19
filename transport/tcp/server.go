@@ -5,22 +5,23 @@ import (
 	"net"
 	"sync"
 
-	"main/datasource"
-	"main/transport/sender"
+	"main/sender"
 )
 
 type (
 	tcpServerWriter struct {
 		address     string
-		inputReader *datasource.MessageReader
 		listener    net.Listener
+		onConn      onConnectionCB
 	}
 )
 
-func NewServerWriter(address string, inputReader *datasource.MessageReader) *tcpServerWriter {
+type onConnectionCB func(w sender.Writer)
+
+func NewServerWriter(address string, onConn onConnectionCB) *tcpServerWriter {
 	return &tcpServerWriter{
 		address:     address,
-		inputReader: inputReader,
+		onConn:      onConn,
 	}
 }
 
@@ -66,14 +67,11 @@ func (w *tcpServerWriter) listenWorker() {
 }
 
 func (w *tcpServerWriter) connectionWorker(conn net.Conn) {
-	inp := *w.inputReader
+
 	connWriter := NewConnectionWriter(conn)
 
-	sndr := sender.New(connWriter, &inp)
+	w.onConn(connWriter)
 
-	go func() {
-		sndr.Run()
-		fmt.Printf("\n---> all data is sent to [%s] \n", conn.RemoteAddr())
-		_ = conn.Close()
-	}()
+	fmt.Printf("\n---> all data is sent to [%s] \n", conn.RemoteAddr())
+	_ = conn.Close()
 }

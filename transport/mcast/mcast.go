@@ -1,9 +1,7 @@
 package mcast
 
 import (
-	"context"
 	"net"
-	"sync"
 
 	"github.com/pkg/errors"
 )
@@ -12,9 +10,9 @@ type mcastWriter struct {
 	address string
 	conn    net.Conn
 
-	ctx  context.Context
-	wg   *sync.WaitGroup
-	stop context.CancelFunc
+	//ctx  context.Context
+	//wg   *sync.WaitGroup
+	//stop context.CancelFunc
 }
 
 func NewWriter(address string) *mcastWriter {

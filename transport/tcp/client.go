@@ -1,9 +1,7 @@
 package tcp
 
 import (
-	"context"
 	"net"
-	"sync"
 
 	"github.com/pkg/errors"
 )
@@ -11,10 +9,6 @@ import (
 type tcpClientWriter struct {
 	address string
 	conn    net.Conn
-
-	ctx  context.Context
-	wg   *sync.WaitGroup
-	stop context.CancelFunc
 }
 
 func NewClientWriter(address string) *tcpClientWriter {
